@@ -1,15 +1,11 @@
 ---
-marp: true
-size: 4:3
-auto-scaling: 
-    - true
-    - fittingHeader
-    - math
-    - code
-backgroundColor: #fff
-backgroundImage: url('https://marp.app/assets/hero-background.jpg')
-paginate: true
-header: Aprendizaje por refuerzo y técnicas generativas. 
+title       : MongoDB
+author      : Edgar Talavera Muñoz <e.talavera@upm.es>
+description : >
+  En ***2015***, *DeepMind*, siendo ya parte de Google, presentó un avance en el campo del aprendizaje por refuerzo profundo con la introducción de ***Deep Q Network (DQN)***, marcando el comienzo del campo conocido hoy como *Deep Reinforcement Learning*.
+marp        : true
+paginate    : true
+theme       : bbdd
 ---
 <!--
 _header: ''
@@ -22,10 +18,12 @@ Deep Q Network (DQN)
 
 ---
 
-<style scoped>
-li { font-size: 0.7rem; }
-p { font-size: 0.75rem; }
-</style>
+<!-- _class: section -->
+# Introducción a Deep Q-learning
+
+
+---
+
 
 ## Introducción
 
@@ -44,8 +42,8 @@ Si quieres ahondar en conceptos de Deep Learning, algunos recursos recomendados:
 ---
 
 <style scoped>
-li { font-size: 0.6rem; }
-p { font-size: 0.7rem; }
+li { font-size: 0.7rem; }
+p { font-size: 0.9rem; }
 </style>
 
 ## Un poco de historia
@@ -68,7 +66,7 @@ p { font-size: 0.7rem; }
 
 
 <p align="center" width="100%">
-    <img width="60%" src="Q-learn_DQlearn.png"> 
+    <img width="55%" src="images/DQN/Q-learn_DQlearn.png"> 
 </p>
 
 - En ***Q-Learning*** usamos la tablas de estados y acciones, o Q-valores.
@@ -78,8 +76,8 @@ p { font-size: 0.7rem; }
 
 
 <style scoped>
-li { font-size: 0.3rem; }
-p { font-size: 0.65rem; }
+li { font-size: 0.45rem; }
+p { font-size: 0.8rem; }
 </style>
 
 ## Q-Learning vs. Deep Q-Learning
@@ -98,77 +96,116 @@ El uso de ***redes neuronales*** tiene varios propósitos importantes en compara
 
 ---
 
-### Otros conocimientos recomendados
-
-- Bases de datos relacionales
-- Programación
-
----
 
 <style scoped>
 li { font-size: 0.8rem; }
 p { font-size: 0.8rem; }
 </style>
 
-## Competencias
+## El agente y su entorno
 
-**CB03** |  Que los estudiantes tengan la capacidad de reunir e interpretar datos relevantes (normalmente dentro de su área de estudio) para emitir juicios que incluyan una reflexión sobre temas relevantes de índole social, científica o ética.
+<p align="center" width="100%">
+    <img width="65%" src="images/DQN/AgentEnvironment.png"> 
+</p>
 
-**CB04** | Que los estudiantes puedan transmitir información, ideas, problemas y soluciones a un público tanto especializado como no especializado.
+El ***agente*** y el ***entorno*** interactúan continuamente entre sí, cada iteración el agente toma una acción en el entorno donde varía la observación actual, y recibe una recompensa y la siguiente observación desde el entorno. 
 
-**CE05** | Capacidad de diseñar e implementar los procesos de selección, limpieza, transformación, integración y verificación de la calidad de los datos de cara a su posterior tratamiento.
-
-**CE07** | Capacidad de diseñar e implementar sistemas de información (incluyendo modelos de datos y estrategias de gestión de datos) dimensionados para gestionar el volumen, velocidad y variedad de los datos, de forma adecuada para su almacenamiento, procesamiento y acceso para tratamientos posteriores.
+El objetivo es mejorar el agente en cada iteración para maximizar la suma de recompensas.
 
 
 ---
+
+
+## Deep Q-Learning
+
+
+***Q-Learning*** funciona muy bien cuando el entorno es simple y la función Q(s,a) se puede representar como una tabla o matriz de valores. 
+
+**Deep Q-Network o DQN** combina el algoritmo Q-learning con redes neuronales.
+ - usa una red neuronal para aproximar la ***función Q*** (En realidad, utiliza dos redes neuronales para estabilizar el proceso de aprendizaje).
+ - la red neuronal principal (main Neural Network), representada por los parámetros ***θ***, se utiliza para estimar los ***valores-Q*** del estado ***s*** y acción a actuales: ***Q(s, a; θ)***. 
+ - la red neuronal objetivo (target Neural Network), parametrizada por ***θ´***, tendrá la misma arquitectura que la red principal pero se usará para aproximar los ***valores-Q*** del siguiente estado ***s´*** y la siguiente acción ***a´***.
+
+---
+
+## Deep Q-Learning, entrenamiento
+
+El entrenamiento ocurre solo ***en la red principal*** y no en la objetivo. 
+
+La ***red objetivo se congela*** (sus parámetros se congelan) durante varias iteraciones (normalmente alrededor de 10000).
+
+Despues de las iteraciones predefinidas, ***los parámetros de la red principal se copian*** a la ***red objetivo***, transmitiendo así el aprendizaje de una a otra, haciendo que las estimaciones calculadas por la red objetivo sean más precisas.
+
+---
+
+## Ecuación de Bellman en DQN
+
+<p align="center" width="100%">
+    <img width="35%" src="images/DQN/bellmanDQN.png"> 
+</p>
+
+La función de Bellman cambia para adaptarse a las redes neuronales y a su vez, necesitamos de una ***función de pérdida ***(***loss function***) definida como el cuadrado de la diferencia entre ambos lados de la ec. de Bellman.
+
+<p align="center" width="100%">
+    <img width="45%" src="images/DQN/lossfunctionBellman.png"> 
+</p>
+
+Ésta ***loss function*** será la que minimizaremos usando el algoritmo de descenso de gradientes, viene definida dentro de las librerías de ***TensorFlow*** o ***PyTorch***.
+
+---
+
 
 <style scoped>
 li { font-size: 0.8rem; }
 p { font-size: 0.8rem; }
+div.noticia {
+  width: 100%;
+  font-size: 0.8rem; 
+}
+
+div.noticia img.izquierda {
+  float: right;
+  margin-right: 15px;
+}
+div.reset {
+  clear: both;
+}
 </style>
 
-## Resultados de aprendizaje
+## El entorno de Cartpole
 
-**RA129** - Ser capaz de implementar y gestionar una base de datos en un gestor no relacional.
 
-**RA89** - Usar lenguajes de programación y de descripción de datos, comunes en Ciencia de Datos.
 
-**RA76 - RA-APID-5** Configuración, administración, uso y optimización de sistemas gestores de bases de datos relacionales.
+<div class="noticia">
+    <img width="25%" class="izquierda" src="images/DQN/cartpole.png"> 
+<aside><b>Cartpole</b> es uno de los problemas de aprendizaje de refuerzo <b>clásicos</b> ("Hola, mundo!"). Un poste está sujeto a un carro, que puede moverse a lo largo de una pista sin fricción. El poste comienza en posición vertical y el objetivo es evitar que se caiga controlando el carro.
 
-**RA77 - RA-APID-6** Diseño, creación, consulta y manipulación de repositorios de datos, e integración con aplicaciones del sistema.
+La observación del entorno es un vector 4D representa la posición y la velocidad del carro, y el ángulo y la velocidad angular del polo. El agente puede controlar el sistema mediante 2 acciones, empujar a la derecha (1) o izquierda (-1).
+</aside>
+</div>
 
-**RA134 - RA114 - RA-APID-18** Ser capaz de utilizar las tecnologías de información para preparar los conjuntos de datos.
+Las claves del juego vienen dadas por:
+- La recompensa de dá según pasa el tiempo y el palo permanece vertical.
+- El juego termina cuando el poste se inclina por encima de algún límite o el carro se mueve fuera de los bordes del mundo.
+- El objetivo del agente es aprender a maximizar la suma de recompensas. 
+
+["Tutorial DQN en Cartpole de Tensorflow"](https://github.com/tensorflow/agents/blob/master/docs/tutorials/1_dqn_tutorial.ipynb)
 
 ---
 
-<style scoped>
-li { font-size: 0.5rem; }
-p { font-size: 0.5rem; }
-</style>
 
-## Temario guía docente
 
-1. Bloque I: Bases de datos avanzadas
-   1. Bases de datos basadas en ficheros
-   2. Bases de datos federadas
-2. Bloque II: Gobernanza de datos
-   1. Gobernanza de datos
-   2. Data provenance
-   3. Curación y limpieza de datos
-   4. Transformación y serialización de datos
-3. Bloque III: Bases de datos NoSQL
-   1. Fundamentos de bases de datos NoSQL
-   2. Comparativa de bases de datos relacionales vs NoSQL
-   3. Tipos y características de bases de datos NoSQL
-   4. Bases de datos documentales
-   5. Bases de datos basadas en grafos
-   6. Bases de datos basadas en clave-valor
-   7. Otras bases de datos (dispersas, columnares, en memoria, ...)
-4. Bloque IV: Data streaming
-   1. Procesamiento de datos continuos en memoria
-   2. Motores de data streaming
 
+Como ya hemos vemos, el Q-learning tradicional es poco práctica cuando el problema escala.
+Usando ***DQN*** formamos un aproximador de función Q, tal como una red neuronal con parámetros &theta;, para estimar los valores de Q, es decir, Q(s,a;&theta;)&asymp; Q*(s,a).
+Es decir, puede hacerse mediante la minimización de la siguiente pérdida en cada paso $i$:
+
+<p align="center" width="100%">
+    <img width="85%" src="images/DQN/ecuaciónql.png"> 
+</p>
+
+$Y_i$ se llama a la diferencia temporal (TD) destino, e $Y_i - Q$ al error en TD.
+$p$ representa la distribución del comportamientos, expresada en transiciones $(s,a,r,s')$
 
 ---
 
