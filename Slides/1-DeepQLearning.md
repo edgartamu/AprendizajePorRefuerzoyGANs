@@ -189,111 +189,309 @@ Las claves del juego vienen dadas por:
 - El juego termina cuando el poste se inclina por encima de algún límite o el carro se mueve fuera de los bordes del mundo.
 - El objetivo del agente es aprender a maximizar la suma de recompensas. 
 
-["Tutorial DQN en Cartpole de Tensorflow"](https://github.com/tensorflow/agents/blob/master/docs/tutorials/1_dqn_tutorial.ipynb)
+["Tutorial DQN de Cartpole en Tensorflow"](https://github.com/tensorflow/agents/blob/master/docs/tutorials/1_dqn_tutorial.ipynb)
+
+["Tutorial DQN de Cartpole en Pytorch"](https://colab.research.google.com/drive/1w5xFX2wJvtuVbcrDHny7YPcTdGqMOqMu#offline=true&sandboxMode=true)
+
 
 ---
 
+## Ejemplo de DQN: Creación de las redes neuronales
+
+```python
+class DQN(tf.keras.Model):
+  """Perceptron multicapa de 2 capas de 32 y una se salida"""
+  def __init__(self):
+    super(DQN, self).__init__()
+    self.dense1 = tf.keras.layers.Dense(32, activation="relu")
+    self.dense2 = tf.keras.layers.Dense(32, activation="relu")
+    self.dense3 = tf.keras.layers.Dense(num_actions, dtype=tf.float32) # No activation
+    
+  def call(self, x):
+    """Construcción de las capas"""
+    x = self.dense1(x)
+    x = self.dense2(x)
+    return self.dense3(x)
+
+main_nn = DQN() # Red principal
+target_nn = DQN() # Red objetivo
+
+optimizer = tf.keras.optimizers.Adam(1e-4) #Optimizados Adam
+mse = tf.keras.losses.MeanSquaredError() #Loss function MSE
+```
+---
+
+
+## Ejemplo de DQN: Creación del buffer para la experiencia
+
+```python
+class ReplayBuffer(object):
+  """Experience replay buffer that samples uniformly."""
+  def __init__(self, size):
+    self.buffer = deque(maxlen=size)
+
+  def add(self, state, action, reward, next_state, done):
+    self.buffer.append((state, action, reward, next_state, done))
+
+  def __len__(self):
+    return len(self.buffer)
+
+  def sample(self, num_samples):
+    states, actions, rewards, next_states, dones = [], [], [], [], []
+    idx = np.random.choice(len(self.buffer), num_samples)
+    for i in idx:
+      elem = self.buffer[i]
+      state, action, reward, next_state, done = elem
+      states.append(np.array(state, copy=False))
+      actions.append(np.array(action, copy=False))
+      rewards.append(reward)
+      next_states.append(np.array(next_state, copy=False))
+      dones.append(done)
+    states = np.array(states)
+    actions = np.array(actions)
+    rewards = np.array(rewards, dtype=np.float32)
+    next_states = np.array(next_states)
+    dones = np.array(dones, dtype=np.float32)
+    return states, actions, rewards, next_states, dones
+```
+---
+
+
+## Ejemplo de DQN: función auxiliar para ejecutar la política ε-voraz
+
+```python
+def select_epsilon_greedy_action(state, epsilon):
+  """Acción aleatoria con probabilidad menor que epsilon, en otro caso la mejor."""
+  result = tf.random.uniform((1,))
+  if result < epsilon:
+    return env.action_space.sample() # Elegimos una acción aleatória
+  else:
+    return tf.argmax(main_nn(state)[0]).numpy() # Elección de acción Greedy.
+
+@tf.function # Configuración de cada iteración de entrenamiento
+def train_step(states, actions, rewards, next_states, dones):
+  # Calculo de los objetivos (segunda red)
+  next_qs = target_nn(next_states)
+  max_next_qs = tf.reduce_max(next_qs, axis=-1)
+  target = rewards + (1. - dones) * discount * max_next_qs
+  with tf.GradientTape() as tape:
+    qs = main_nn(states)
+    action_masks = tf.one_hot(actions, num_actions)
+    masked_qs = tf.reduce_sum(action_masks * qs, axis=-1)
+    loss = mse(target, masked_qs)
+  grads = tape.gradient(loss, main_nn.trainable_variables)
+  optimizer.apply_gradients(zip(grads, main_nn.trainable_variables))
+  return loss
+```
+---
+
+## Ejemplo de DQN: función auxiliar para ejecutar la política ε-voraz
+
+Con el cálculo de la ***política ε-voraz***, se definen los hiperparámetros y empezaremos a entrenar el algoritmo. 
+
+1. Utilizamos el ***cálculo ε-voraz*** para jugar al juego y recoger datos para aprender. 
+2. Después de un juego, llamamos a la función que entrena la red neuronal. 
+3. Cada ***2000 epochs***, copiaremos los pesos de la red neuronal principal a la red neuronal objetivo. 
+4. También reduciremos el valor de epsilon (ε), para empezar con un valor de exploración alto y bajarlo poco a poco. Así, veremos cómo el algoritmo empieza a aprender a jugar al juego y la recompensa obtenida jugando al juego irá mejorando poco a poco.
+   
+---
+
+## Ejemplo de DQN: Hyperparámetros y entrenamiento
+
+```python
+# Hyperparámetros
+num_episodes = 1000
+epsilon = 1.0
+batch_size = 32
+discount = 0.99
+buffer = ReplayBuffer(100000)
+cur_frame = 0
+
+# Comienzo del entrenamiento. Jugamos una vez y entrenamos con un batch.
+last_100_ep_rewards = []
+for episode in range(num_episodes+1):
+  state = env.reset() #reseteo del ecosistema
+  ep_reward, done = 0, False
+  while not done:
+    state_in = tf.expand_dims(state, axis=0)
+    action = select_epsilon_greedy_action(state_in, epsilon)
+    next_state, reward, done, info = env.step(action)
+    ep_reward += reward
+    # Guardamos el juego.
+    buffer.add(state, action, reward, next_state, done)
+    state = next_state
+    cur_frame += 1
+    # CoCopiamos los pesos de main_nn a target_nn.
+    if cur_frame % 2000 == 0:
+      target_nn.set_weights(main_nn.get_weights())
+```
+
+---
+
+## Ejemplo de DQN: Hyperparámetros y entrenamiento
+
+```python
+    # Entrenamiento de la red neuronal.
+    if len(buffer) >= batch_size:
+      states, actions, rewards, next_states, dones = buffer.sample(batch_size)
+      loss = train_step(states, actions, rewards, next_states, dones)
+  
+  if episode < 950:
+    epsilon -= 0.001
+
+  if len(last_100_ep_rewards) == 100:
+    last_100_ep_rewards = last_100_ep_rewards[1:]
+  last_100_ep_rewards.append(ep_reward)
+    
+  if episode % 50 == 0:
+    print(f'Episode {episode}/{num_episodes}. Epsilon: {epsilon:.3f}. '
+          f'Reward in last 100 episodes: {np.mean(last_100_ep_rewards):.3f}')
+env.close()
+```
+
+---
+
+<!-- _class: section -->
+# Double Deep Q-Network y Dueling Deep Q-Network
+
+---
+
+## Algoritmos avanzados de DQN
+
+El algoritmo de DQN, es capaz de solucionar problemas complejos, pero también tiene deficiencias.
+
+Por ello, aparecen algoritmos aportando mejoras como lo son ***Double Deep Q-Network*** (Double DQN) y ***Dueling Deep Q-Network*** (Dueling DQN). 
+
+Ambos modelos tienen la capacidad para ***mejorar la estabilidad y eficacia del aprendizaje*** por refuerzo en entornos desafiantes. 
 
 
 
-Como ya hemos vemos, el Q-learning tradicional es poco práctica cuando el problema escala.
-Usando ***DQN*** formamos un aproximador de función Q, tal como una red neuronal con parámetros &theta;, para estimar los valores de Q, es decir, Q(s,a;&theta;)&asymp; Q*(s,a).
-Es decir, puede hacerse mediante la minimización de la siguiente pérdida en cada paso $i$:
+---
 
+## Double Deep Q-Network
+
+***Double DQN*** surge para mitigar el sesgo que ***comete algoritmo DQN*** es que sobreestima las recompensas reales; es decir, los valores-Q que aprende pisan que va a obtener una recompensa mayor de la que tendrá en realidad.
+
+Double DQN propone separar la selección y la evaluación de una acción en dos pasos, usando ***dos redes neuronales*** para estimar los valores de acción y actualizarlas de manera independiente.
 <p align="center" width="100%">
-    <img width="85%" src="images/DQN/ecuaciónql.png"> 
+    <img width="65%" src="images/DQN/BELLMANdoubleDQN.png"> 
 </p>
 
-$Y_i$ se llama a la diferencia temporal (TD) destino, e $Y_i - Q$ al error en TD.
-$p$ representa la distribución del comportamientos, expresada en transiciones $(s,a,r,s')$
-
----
-
-
-<style scoped>
-li { font-size: 0.6rem;}
-p { font-size: 0.6rem;}
-</style>
-
-## Temario
-
-1. Bloque I: Bases de datos avanzadas
-   1. Introducción a las bases de datos NoSQL (tipos de bases de datos No-SQL)
-   2. Comparativa entre bases de datos relacionales vs bases de datos NoSQL
-   3. Tipos de características de bases de datos NoSQL (Bases de datos basadas en ficheros)
-2. Bloque II: Gobernanza de datos
-   1. Gobernanza de datos y data provenance
-   2. Curación y limpieza de datos
-   3. Transformación y serialización de datos
-3. Bloque III: Bases de datos NoSQL
-   1. Mongodb - bases de datos basadas en documentos
-   2. Cassandra - bases de datos basadas en columnas (key-value)
-   3. Neo4j - bases de datos basadas en grafos
-4. Bloque IV: Data streaming
-   1. Programación contra bases de datos
-   2. Motores de data streaming 
+Primero la red neuronal principal ***θ*** decide cuál es la mejor acción entre todas las posibles, y luego la ***red objetivo*** evalúa esa acción para conocer su ***valor-Q***.
 
 
 ---
 
+## Dueling Deep Q-Network
 
-## Horario
+Este algoritmo divide los ***valores-Q en dos partes distintas***, la función de valor (value function) ***V(s)*** y la función de ventaja (advantage function) ***A(s, a)***.
 
-![w:500](images/Cronograma.png)
-
----
-
-<style scoped>
-li { font-size: 0.8rem; }
-p { font-size: 0.8rem; }
-</style>
-
-## Evaluación progresiva
-
-Prácticas (40%)
-- En grupos
-- Evaluación en el aula
-
-Examen final (60%)
-- Nota mínima de 4
-- Todo el temario
-- Viernes 9 de junio de 2023 a las 10:00 en el aula 1302
-
-Será necesario alcanzar una nota total >= 5 para aprobar la asignatura.
+- La ***función de valor V(s)*** nos dice cuánta recompensa obtendremos desde el estado s.
+- La ***función de ventaja A(s, a)*** nos dice cuánto mejor es una acción respecto a las demás.
+- Combinando el valor ***V*** y la ventaja ***A*** de cada acción, obtenemos los valores-Q:
+  
+<p align="center" width="100%">
+    <img width="45%" src="images/DQN/BELLMANDuelingDQN.png"> 
+</p>
 
 ---
 
-## Evaluación prueba global
 
-Prueba escrita el **viernes 9 de junio de 2023 a las 10:00** en el aula **1302** incluyendo preguntas teórico-prácticas de todo el temario de la asignatura.
+## Dueling Deep Q-Network
 
-Es necesaro obtener una nota mínima de 4 sobre 10.
+***Dueling DQN*** divide la capa final de la red en dos:
+1. Estima el valor del estado s (V(s)) 
+2. Estima la ventaja de cada acción a (A(s, a))
 
-Para aprobar sin haber seguido la evaluación progresiva será necesario obtener una nota total >= 5 (la prueba global cuenta un 60% del total de la nota, por lo que sacar un 5 en esta prueba no equivale a aprobar la asignatura).
+La unión de ambas partes estima los valores-Q.
+
+  
+<p align="center" width="100%">
+    <img width="45%" src="images/DQN/duelingvsdqn.png"> 
+</p>
+
+---
+
+## Dueling Deep Q-Network: Código
+
+```python
+class DuelingDQN(tf.keras.Model):
+  """CNN para juegos de Atari."""
+  def __init__(self, num_actions):
+    super(DuelingDQN, self).__init__()
+    self.conv1 = tf.keras.layers.Conv2D(
+        filters=32, kernel_size=8, strides=4, activation="relu",
+    )
+    self.conv2 = tf.keras.layers.Conv2D(
+        filters=64, kernel_size=4, strides=2, activation="relu",
+    )
+    self.conv3 = tf.keras.layers.Conv2D(
+        filters=64, kernel_size=3, strides=1, activation="relu",
+    )
+    self.flatten = tf.keras.layers.Flatten()
+    self.dense1 = tf.keras.layers.Dense(units=512, activation="relu")
+    self.V = tf.keras.layers.Dense(1)
+    self.A = tf.kears.layers.Dense(num_actions)
+```
 
 ---
 
-## Convocatoria extraordinaria
+## Dueling Deep Q-Network: Código
 
-Prueba escrita el **jueves 6 de julio de 2023 a las 10:00** incluyendo preguntas teórico-prácticas de todo el temario de la asignatura.
-
-Es obligatorio alcanzar una nota mínima de 5 puntos sobre 10.
+```python
+  @tf.function
+  def call(self, states):
+    """Forward pass of the neural network with some inputs."""
+    x = self.conv1(states)
+    x = self.conv2(x)
+    x = self.conv3(x)
+    x = self.flatten(x)
+    x = self.dense1(x)
+    V = self.V(x)
+    A = self.A(x)
+    Q = V + tf.subtract(A, tf.reduce_mean(A, axis=1, keepdims=True))
+    return Q
+```
+[Código en tensorflow](https://colab.research.google.com/drive/16RjttswTuAjgqVV2jA-ioY2xVEQqIcQE#offline=true&sandboxMode=true)
+[Código en Pytorch](https://colab.research.google.com/drive/1EW7i4Jo_u2VbZAls7CVON_bKfFyKqKIn#offline=true&sandboxMode=true)
 
 ---
-<style scoped>
-li { font-size: 0.7rem; }
-p { font-size: 0.8rem; }
-</style> 
+
+## Dueling Deep Q-Network: Código entrenamiento
+
+```python
+@tf.function
+def train_step(states, actions, rewards, next_states, dones):
+  # Selección de la proxima mejor acción con main_nn.
+  next_qs_main = main_nn(next_states)
+  next_qs_argmax = tf.argmax(next_qs_main, axis=-1)
+  next_action_mask = tf.one_hot(next_qs_argmax, num_actions)
+  
+  # Evaluamos la mejor acción con target_nn para sacar el Q-value.
+  next_qs_target = target_nn(next_states)
+  masked_next_qs = tf.reduce_sum(next_action_mask * next_qs_target, axis=-1)
+  
+  # Creamos el objetivo usando la recompensa y el descuento del proximo Q-value.
+  target = rewards + (1. - dones) * discount * masked_next_qs
+  with tf.GradientTape() as tape:
+    qs = main_nn(states) # Q-values del estado actual.
+    action_mask = tf.one_hot(actions, num_actions)
+    masked_qs = tf.reduce_sum(action_mask * qs, axis=-1)
+    loss = loss_fn(target, masked_qs)
+    
+  grads = tape.gradient(loss, main_nn.trainable_variables)
+  optimizer.apply_gradients(zip(grads, main_nn.trainable_variables))
+  return loss
+```
+
+---
 
 ## Recursos didácticos
 
-1. **Moodle de la asignatura.**
-2. Data Governance: How to Design, Deploy, and Sustain an Effective Data Governance Program (English Edition) 2o Edición. John Ladley.
-3. Data Provenance A Complete Guide - 2020 Edition (English Edition). Gerardus Blokdyk
-4. Pandas 1.x Cookbook: Practical recipes for scientific computing, time series analysis, and  exploratory data analysis using Python, 2nd Edition (English Edition). Matt Harrison; Theodore Petrou
-5. SQL & NoSQL Databases: A Comprehensive Introduction To Relational (SQL) And Non-relational (NoSQL) Databases (English Edition). Danniella Hardin
-6. SQL & NoSQL Databases: Models, Languages, Consistency Options and Architectures for Big Data Management (English Edition). Andreas Meier; Michael Kaufmann
-7. Stream Processing with Apache Flink: Fundamentals, Implementation, and Operation of Streaming Applications. Fabian Hueske, Vasiliki Kalavri
+1. [Mnih, V. et al. (2015). Human-level control through deep reinforcement learning. Nature, 518(7540), 529.](https://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf)
+2. [Wang, Ziyu, et al. “Dueling network architectures for deep reinforcement learning.” arXiv preprint arXiv:1511.06581 (2015)](https://arxiv.org/pdf/1511.06581.pdf)
+3. [Van Hasselt, Hado, Arthur Guez, and David Silver. “Deep reinforcement learning with double q-learning.” Thirtieth AAAI conference on artificial intelligence. 2016](https://doi.org/10.1609/aaai.v30i1.10295)
+4. [Tensorflow tutoriales de agentes para aprendizaje por refuerzo](https://www.tensorflow.org/agents/tutorials/1_dqn_tutorial?hl=es-419)
 
 
 
