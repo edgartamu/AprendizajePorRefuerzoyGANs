@@ -123,7 +123,7 @@ El objetivo es mejorar el agente en cada iteración para maximizar la suma de re
 
 **Deep Q-Network o DQN** combina el algoritmo Q-learning con redes neuronales.
  - usa una red neuronal para aproximar la ***función Q*** (En realidad, utiliza dos redes neuronales para estabilizar el proceso de aprendizaje).
- - la red neuronal principal (main Neural Network), representada por los parámetros ***θ***, se utiliza para estimar los ***valores-Q*** del estado ***s*** y acción a actuales: ***Q(s, a; θ)***. 
+ - la red neuronal principal (main Neural Network), representada por los parámetros ***θ***, se utiliza para estimar los ***valores-Q*** del estado ***s*** y acción ***a*** actuales: ***Q(s, a; θ)***. 
  - la red neuronal objetivo (target Neural Network), parametrizada por ***θ´***, tendrá la misma arquitectura que la red principal pero se usará para aproximar los ***valores-Q*** del siguiente estado ***s´*** y la siguiente acción ***a´***.
 
 ---
@@ -132,7 +132,7 @@ El objetivo es mejorar el agente en cada iteración para maximizar la suma de re
 
 El entrenamiento ocurre solo ***en la red principal*** y no en la objetivo. 
 
-La ***red objetivo se congela*** (sus parámetros se congelan) durante varias iteraciones (normalmente alrededor de 10000).
+La ***red objetivo se congela*** (sus parámetros se congelan) durante varias iteraciones (normalmente alrededor de 2000).
 
 Despues de las iteraciones predefinidas, ***los parámetros de la red principal se copian*** a la ***red objetivo***, transmitiendo así el aprendizaje de una a otra, haciendo que las estimaciones calculadas por la red objetivo sean más precisas.
 
