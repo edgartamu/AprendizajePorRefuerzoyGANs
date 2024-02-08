@@ -27,11 +27,11 @@ Deep Q Network (DQN)
 
 ## Introducción
 
-Visto anteriormente el Aprendizaje por refuerzo, e introducido a este campo a través de una de sus técnicas más populares: el *Q-learning*. Y además, se han establecido las bases hablando de procesos de decisión de Markov, políticas y funciones de valor.
+Previamente en "Aprendizaje por refuerzo", se ha introducido una de sus técnicas más populares: el *Q-learning*. Y además, se han establecido las bases hablando de procesos de decisión de Markov, políticas y funciones de valor.
 
 En este apartado extenderemos las técnicas de ***Q-Learning*** clásico incorporando el uso de *redes neuronales*, dando pie a la evolución a los modelos de ***Deep Q Network***.
 
-Si quieres ahondar en conceptos de Deep Learning, algunos recursos recomendados:
+Algunos conocimientos de Deep Learning y recursos recomendados de interes:
 
 - https://www.coursera.org/learn/neural-networks-deep-learning
 - https://www.tensorflow.org/guide/core/mlp_core
@@ -66,7 +66,7 @@ p { font-size: 0.7rem; }
 
 
 <p align="center" width="100%">
-    <img width="55%" src="images/DQN/Q-learn_DQlearn.png"> 
+    <img width="50%" src="images/DQN/Q-learn_DQlearn.png"> 
 </p>
 
 - En ***Q-Learning*** usamos la tablas de estados y acciones, o Q-valores.
@@ -84,7 +84,7 @@ p { font-size: 0.8rem; }
 
 El uso de ***redes neuronales*** tiene varios propósitos importantes en comparación con el enfoque tradicional de Q-Learning:
 
- - ***Aproximación de la función Q***: En Q-Learning la tabla que almacena los Q-valores de cada par estado-acción posible, aciendo dependiente de la complejidad del problema. Una ***red neuronal*** permite aproximar la función Q, lo que significa que ***cedemos*** a la red el aprender una representación de la función Q, como si generase su propia Q-tabla.
+ - ***Aproximación de la función Q***: En Q-Learning la tabla que almacena los Q-valores de cada par estado-acción posible, haciendo dependiente de la complejidad del problema. Una ***red neuronal*** permite aproximar la función Q, lo que significa que ***cedemos*** a la red el aprender una representación de la función Q, como si generase su propia Q-tabla.
 
  - ***Generalización y abstracción***: Las redes neuronales por definición buscan generalizar a partir de ejemplos y extraer características relevantes de los datos de entrada.
 
