@@ -25,7 +25,7 @@ Deep Q Network (DQN)
 ---
 
 
-## Introducción
+# Introducción
 
 Previamente en "Aprendizaje por refuerzo", se ha introducido una de sus técnicas más populares: el *Q-learning*. Y además, se han establecido las bases hablando de procesos de decisión de Markov, políticas y funciones de valor.
 
@@ -46,7 +46,7 @@ li { font-size: 0.7rem; }
 p { font-size: 0.9rem; }
 </style>
 
-## Un poco de historia
+# Un poco de historia
 
 En ***2015***, *DeepMind*, siendo ya parte de Google, presentó un avance en el campo del aprendizaje por refuerzo profundo con la introducción de ***Deep Q Network (DQN)***, marcando el comienzo del campo conocido hoy como *Deep Reinforcement Learning*.
 
@@ -62,11 +62,11 @@ li { font-size: 0.7rem; }
 p { font-size: 0.7rem; }
 </style>
 
-## Q-Learning vs. Deep Q-Learning
+# Q-Learning vs. Deep Q-Learning
 
 
 <p align="center" width="100%">
-    <img width="50%" src="images/DQN/Q-learn_DQlearn.png"> 
+    <img width="45%" src="images/DQN/Q-learn_DQlearn.png"> 
 </p>
 
 - En ***Q-Learning*** usamos la tablas de estados y acciones, o Q-valores.
@@ -80,7 +80,7 @@ li { font-size: 0.45rem; }
 p { font-size: 0.8rem; }
 </style>
 
-## Q-Learning vs. Deep Q-Learning
+# Q-Learning vs. Deep Q-Learning
 
 El uso de ***redes neuronales*** tiene varios propósitos importantes en comparación con el enfoque tradicional de Q-Learning:
 
@@ -102,7 +102,7 @@ li { font-size: 0.8rem; }
 p { font-size: 0.8rem; }
 </style>
 
-## El agente y su entorno
+# El agente y su entorno
 
 <p align="center" width="100%">
     <img width="65%" src="images/DQN/AgentEnvironment.png"> 
@@ -114,46 +114,6 @@ El objetivo es mejorar el agente en cada iteración para maximizar la suma de re
 
 
 ---
-
-
-## Deep Q-Learning
-
-
-***Q-Learning*** funciona muy bien cuando el entorno es simple y la función Q(s,a) se puede representar como una tabla o matriz de valores. 
-
-**Deep Q-Network o DQN** combina el algoritmo Q-learning con redes neuronales.
- - usa una red neuronal para aproximar la ***función Q*** (En realidad, utiliza dos redes neuronales para estabilizar el proceso de aprendizaje).
- - la red neuronal principal (main Neural Network), representada por los parámetros ***θ***, se utiliza para estimar los ***valores-Q*** del estado ***s*** y acción ***a*** actuales: ***Q(s, a; θ)***. 
- - la red neuronal objetivo (target Neural Network), parametrizada por ***θ´***, tendrá la misma arquitectura que la red principal pero se usará para aproximar los ***valores-Q*** del siguiente estado ***s´*** y la siguiente acción ***a´***.
-
----
-
-## Deep Q-Learning, entrenamiento
-
-El entrenamiento ocurre solo ***en la red principal*** y no en la objetivo. 
-
-La ***red objetivo se congela*** (sus parámetros se congelan) durante varias iteraciones (normalmente alrededor de 2000).
-
-Despues de las iteraciones predefinidas, ***los parámetros de la red principal se copian*** a la ***red objetivo***, transmitiendo así el aprendizaje de una a otra, haciendo que las estimaciones calculadas por la red objetivo sean más precisas.
-
----
-
-## Ecuación de Bellman en DQN
-
-<p align="center" width="100%">
-    <img width="35%" src="images/DQN/bellmanDQN.png"> 
-</p>
-
-La función de Bellman cambia para adaptarse a las redes neuronales y a su vez, necesitamos de una ***función de pérdida ***(***loss function***) definida como el cuadrado de la diferencia entre ambos lados de la ec. de Bellman.
-
-<p align="center" width="100%">
-    <img width="45%" src="images/DQN/lossfunctionBellman.png"> 
-</p>
-
-Ésta ***loss function*** será la que minimizaremos usando el algoritmo de descenso de gradientes, viene definida dentro de las librerías de ***TensorFlow*** o ***PyTorch***.
-
----
-
 
 <style scoped>
 li { font-size: 0.8rem; }
@@ -172,7 +132,7 @@ div.reset {
 }
 </style>
 
-## El entorno de Cartpole
+# El entorno de Cartpole
 
 
 
@@ -196,7 +156,108 @@ Las claves del juego vienen dadas por:
 
 ---
 
-## Ejemplo de DQN: Creación de las redes neuronales
+# Deep Q-Learning
+
+
+**Deep Q-Network o DQN** combina la idea del Q-learning aplicando *redes neuronales*.
+ - Usa ***una red neuronal*** para aproximar la ***función Q*** (En realidad, utiliza dos redes neuronales para estabilizar el proceso de aprendizaje).
+ - La ***red neuronal principal (main Neural Network)***, representada por los parámetros ***θ***, se utiliza para estimar los ***valores-Q*** del estado ***s*** y acción ***a*** actuales: ***Q(s, a; θ)***. 
+ - La ***red neuronal objetivo (target Neural Network)***, parametrizada por ***θ´***, tendrá la misma arquitectura que la red principal pero se usará para aproximar los ***valores-Q*** del siguiente estado ***s´*** y la siguiente acción ***a´***.
+
+---
+
+# Deep Q-Learning - Ecuación de Bellman
+
+La función de Bellman cambia para adaptarse a las redes neuronales partiendo de:
+
+<p align="center" width="100%">
+    <img width="35%" src="images/DQN/bellmanDQN.png"> 
+</p>
+
+La adaptación de la ecuación se debe a la necesidad de una ***función de pérdida*** (***loss function***) definida como el cuadrado de la diferencia entre ambos lados de la ecuación.
+
+
+<p align="center" width="100%">
+    <img width="50%" src="images/DQN/BellmanDQN-explain.png"> 
+</p>
+
+
+Al convertirlo en una ***loss function*** el objetivo de la red será minimizar usando el algoritmo de descenso de gradientes (viene definida dentro de las librerías de ***TensorFlow*** o ***PyTorch***).
+
+---
+
+# Deep Q-Learning - [wikidocs](https://wikidocs.net/169315) 
+
+<p align="center" width="100%">
+    <img width="60%" src="images/DQN/DQN-structure.png"> 
+</p>
+
+
+---
+
+# Deep Q-Learning - train()
+
+La función *train(), fit(), train_on_batch()* solo ocurre ***en la red principal*** y en la objetivo se utilizará *predict()*. 
+
+- El entrenamiento tiene un paso inicial o ***arranque en frio*** para generar los primeros escenarios.
+  
+- La ***red objetivo se congela*** (sus parámetros) durante varias iteraciones (2000~10000).
+
+- Despues de las iteraciones predefinidas, ***los parámetros de la red principal se copian*** a la ***red objetivo***, transmitiendo así el aprendizaje de una a otra, haciendo que las estimaciones calculadas por la red objetivo sean más precisas.
+
+---
+
+# Deep Q-Learning - pseudo-código ***step 1***
+
+1. Inicialización o ***arranque en frio***:
+   1. Inicializar la red neuronal profunda Q (***main_nn***) con pesos aleatorios.
+   2. Inicializar el estado inicial del entorno (p.e. Cartpole).
+   3. Realizar un "arranque en frío" para ***poblar el búfer de reproducción***:
+      1. Realizar acciones aleatorias en el entorno durante un número predefinido de pasos.
+      2. Almacenar cada transición (estado, acción, recompensa, nuevo estado) en el búfer de reproducción.
+
+---
+<style scoped>
+p { font-size: 0.7rem; }
+table {font-size: 0.7rem;}
+li{font-size: 0.7rem;}
+
+</style>
+
+# Deep Q-Learning - pseudo-código ***step 2***
+
+2. Para cada episodio (¡Recordar! - para cada grabación de diferentes jugadas):
+   1. ***Reiniciar el estado inicial del entorno.***
+   2. ***Para cada paso del episodio:***
+      1. Elegir una acción utilizando una política de exploración/exploitación (por ejemplo, epsilon-greedy).
+      2. Ejecutar la acción en el entorno y observar la recompensa y el nuevo estado.
+      3. Almacenar la transición (estado, acción, recompensa, nuevo estado) en el búfer de reproducción.
+      4. Muestrear un lote de transiciones del búfer de reproducción.
+      5. Para cada transición en el lote:
+         1. Calcular el valor objetivo:
+                  $target = reward + discount\_factor * max(Q(new\_state, action))$
+              - reward es la recompensa recibida por tomar la acción.
+              - discount_factor es el factor de descuento que pondera las recompensas futuras.
+              - Q(new_state, action) es el valor de la acción óptima estimada para el nuevo estado.
+         2. Calcular el error cuadrático medio (MSE) entre el valor objetivo y el valor estimado:
+                  $loss = (target - Q(state, action))^2$
+         3. Realizar un paso de retropropagación (backpropagation) para minimizar el error cuadrático medio.
+      6. Actualizar el estado actual al nuevo estado.
+    3. ***Reducir el valor de epsilon si se está utilizando una política epsilon-greedy.***
+
+---
+
+# Deep Q-Learning - esquema del entrenamiento
+
+<p align="center" width="100%">
+    <img width="40%" src="images/DQN/DQN-train.png"> 
+</p>
+
+
+
+---
+
+# DQN: Creación de las redes neuronales
 
 ```python
 class DQN(tf.keras.Model):
@@ -222,7 +283,7 @@ mse = tf.keras.losses.MeanSquaredError() #Loss function MSE
 ---
 
 
-## Ejemplo de DQN: Creación del buffer para la experiencia
+# DQN: Creación del buffer para la experiencia
 
 ```python
 class ReplayBuffer(object):
@@ -257,7 +318,7 @@ class ReplayBuffer(object):
 ---
 
 
-## Ejemplo de DQN: función auxiliar para ejecutar la política ε-voraz
+# DQN: función ***epsilon-greedy()*** y ***train_step()***
 
 ```python
 def select_epsilon_greedy_action(state, epsilon):
@@ -283,20 +344,10 @@ def train_step(states, actions, rewards, next_states, dones):
   optimizer.apply_gradients(zip(grads, main_nn.trainable_variables))
   return loss
 ```
----
-
-## Ejemplo de DQN: función auxiliar para ejecutar la política ε-voraz
-
-Con el cálculo de la ***política ε-voraz***, se definen los hiperparámetros y empezaremos a entrenar el algoritmo. 
-
-1. Utilizamos el ***cálculo ε-voraz*** para jugar al juego y recoger datos para aprender. 
-2. Después de un juego, llamamos a la función que entrena la red neuronal. 
-3. Cada ***2000 epochs***, copiaremos los pesos de la red neuronal principal a la red neuronal objetivo. 
-4. También reduciremos el valor de epsilon (ε), para empezar con un valor de exploración alto y bajarlo poco a poco. Así, veremos cómo el algoritmo empieza a aprender a jugar al juego y la recompensa obtenida jugando al juego irá mejorando poco a poco.
    
 ---
 
-## Ejemplo de DQN: Hyperparámetros y entrenamiento
+# DQN: Hyperparámetros y entrenamiento
 
 ```python
 # Hyperparámetros
@@ -328,7 +379,7 @@ for episode in range(num_episodes+1):
 
 ---
 
-## Ejemplo de DQN: Hyperparámetros y entrenamiento
+# DQN: resto del código
 
 ```python
     # Entrenamiento de la red neuronal.
@@ -352,13 +403,13 @@ env.close()
 ---
 
 <!-- _class: section -->
-# Double Deep Q-Network y Dueling Deep Q-Network
+# Double DQN y Dueling DQN
 
 ---
 
-## Algoritmos avanzados de DQN
+# Algoritmos avanzados de DQN
 
-El algoritmo de DQN, es capaz de solucionar problemas complejos, pero también tiene deficiencias.
+El algoritmo de ***Deep Q-Network***, es capaz de solucionar problemas complejos, pero también tiene deficiencias.
 
 Por ello, aparecen algoritmos aportando mejoras como lo son ***Double Deep Q-Network*** (Double DQN) y ***Dueling Deep Q-Network*** (Dueling DQN). 
 
@@ -368,21 +419,47 @@ Ambos modelos tienen la capacidad para ***mejorar la estabilidad y eficacia del 
 
 ---
 
-## Double Deep Q-Network
+# ***Double Deep Q-Network***
 
-***Double DQN*** surge para mitigar el sesgo que ***comete algoritmo DQN*** es que sobreestima las recompensas reales; es decir, los valores-Q que aprende pisan que va a obtener una recompensa mayor de la que tendrá en realidad.
+***Double DQN*** surge para mitigar el sesgo que ***comete algoritmo DQN*** al sobreestimar las recompensas reales; es decir, los valores-Q que genera, piensa que va a obtener una recompensa mayor de la que tendrá en realidad.
 
-Double DQN propone separar la selección y la evaluación de una acción en dos pasos, usando ***dos redes neuronales*** para estimar los valores de acción y actualizarlas de manera independiente.
+***Double DQN*** propone separar la selección y la evaluación de una acción en dos pasos, usando ***dos redes neuronales*** para estimar los valores de acción y actualizarlas de manera independiente.
 <p align="center" width="100%">
     <img width="65%" src="images/DQN/BELLMANdoubleDQN.png"> 
 </p>
 
-Primero la red neuronal principal ***θ*** decide cuál es la mejor acción entre todas las posibles, y luego la ***red objetivo*** evalúa esa acción para conocer su ***valor-Q***.
+Este modelo añade un paso, de la red neuronal principal ***θ*** que decide cuál es la mejor acción entre todas las posibles, hace pasar ese resultado sobre la ***red objetivo*** que evalúa esa acción para conocer su ***valor-Q***.
 
+---
+<style>
+.content-wrapc {
+  /* add this */
+  display: flex;
+}
+#footer-a {
+  width: 50%;
+}
+#footer-b {
+  width: 50%;
+  text-align: center;
+}
+</style>
+
+# Double Deep Q-Network
+
+<div class="content-wrapc" align="center" width="100%">
+    <p id="footer-a">Double Deep Q-Network</p>
+    <p id="footer-b">Deep Q-Network</p>
+</div>
+
+<div align="center" width="100%">
+    <img width="49%" src="images/DQN/DoubleDQN-esquema.png"> 
+    <img width="50%" src="images/DQN/DQN-esquema.png">
+</div>
 
 ---
 
-## Dueling Deep Q-Network
+# ***Dueling Deep Q-Network***
 
 Este algoritmo divide los ***valores-Q en dos partes distintas***, la función de valor (value function) ***V(s)*** y la función de ventaja (advantage function) ***A(s, a)***.
 
@@ -393,6 +470,7 @@ Este algoritmo divide los ***valores-Q en dos partes distintas***, la función d
 <p align="center" width="100%">
     <img width="45%" src="images/DQN/BELLMANDuelingDQN.png"> 
 </p>
+
 
 ---
 
@@ -483,6 +561,62 @@ def train_step(states, actions, rewards, next_states, dones):
   optimizer.apply_gradients(zip(grads, main_nn.trainable_variables))
   return loss
 ```
+
+---
+<style scoped>
+p { font-size: 0.7rem; }
+table {font-size: 0.7rem;}
+li{font-size: 0.7rem;}
+
+div.noticia {
+  width: 100%;
+  height: 60%;
+  font-size: 0.8rem; 
+  margin-top:40px;
+}
+
+div.noticia img.izquierda {
+  float: left;
+  margin-right: 70px;
+  margin-left: 35px;
+}
+div.reset {
+  clear: both;
+}
+hr{
+  margin-top:-20px;
+}
+</style>
+
+# [Lunar Lander](http://moonlander.seb.ly/)
+
+
+Es parte de la libreria de Gymnasium, y uno de los entornos dentro de Box2D.
+
+<div class="noticia">
+    <img class="izquierda" width="25%" src="https://www.gymlibrary.dev/_images/lunar_lander.gif" href="https://www.gymlibrary.dev/environments/box2d/lunar_lander/"> 
+<aside>
+
+| Action Space      | Discrete(4)                            |
+|-------------------|----------------------------------------|
+| Observation Shape | (8,)                                   |
+| Observation High  | [1.5 1.5 5. 5. 3.14 5. 1. 1. ]         |
+| Observation Low   | [-1.5 -1.5 -5. -5. -3.14 -5. -0. -0. ] |
+| Import            | gym.make("LunarLander-v2")             |
+</aside>
+
+| s[0]     | s[1]     | s[2]    | s[3]    | s[4]   | s[5]       | s[6]                          | s[7]                          |
+|----------|----------|---------|---------|--------|------------|-------------------------------|-------------------------------|
+| X | Y | Speed X | Speed Y | Ángulo | Ang. Speed | 1º pata tiene contacto sino 0 | 2º pata tiene contacto sino 0 |
+
+</div>
+
+***Acciones***:
+
+1. no hacer nada 
+2. encender motor izquierdo  
+3. encender motor principal 
+4. encender motor derecho
 
 ---
 
