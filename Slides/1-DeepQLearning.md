@@ -66,7 +66,7 @@ p { font-size: 0.7rem; }
 
 
 <p align="center" width="100%">
-    <img width="50%" src="images/DQN/Q-learn_DQlearn.png"> 
+    <img width="45%" src="images/DQN/Q-learn_DQlearn.png"> 
 </p>
 
 - En ***Q-Learning*** usamos la tablas de estados y acciones, o Q-valores.
@@ -144,7 +144,7 @@ Despues de las iteraciones predefinidas, ***los parámetros de la red principal 
     <img width="35%" src="images/DQN/bellmanDQN.png"> 
 </p>
 
-La función de Bellman cambia para adaptarse a las redes neuronales y a su vez, necesitamos de una ***función de pérdida ***(***loss function***) definida como el cuadrado de la diferencia entre ambos lados de la ec. de Bellman.
+La función de Bellman cambia para adaptarse a las redes neuronales y a su vez, necesitamos de una ***función de pérdida*** (***loss function***) definida como el cuadrado de la diferencia entre ambos lados de la ec. de Bellman.
 
 <p align="center" width="100%">
     <img width="45%" src="images/DQN/lossfunctionBellman.png"> 
@@ -483,6 +483,62 @@ def train_step(states, actions, rewards, next_states, dones):
   optimizer.apply_gradients(zip(grads, main_nn.trainable_variables))
   return loss
 ```
+
+---
+<style scoped>
+p { font-size: 0.7rem; }
+table {font-size: 0.7rem;}
+li{font-size: 0.7rem;}
+
+div.noticia {
+  width: 100%;
+  height: 60%;
+  font-size: 0.8rem; 
+  margin-top:40px;
+}
+
+div.noticia img.izquierda {
+  float: left;
+  margin-right: 70px;
+  margin-left: 35px;
+}
+div.reset {
+  clear: both;
+}
+hr{
+  margin-top:-20px;
+}
+</style>
+
+## [Lunar Lander](http://moonlander.seb.ly/)
+<hr>
+
+Es parte de la libreria de Gymnasium, y uno de los entornos dentro de Box2D.
+
+<div class="noticia">
+    <img class="izquierda" width="25%" src="https://www.gymlibrary.dev/_images/lunar_lander.gif" href="https://www.gymlibrary.dev/environments/box2d/lunar_lander/"> 
+<aside>
+
+| Action Space      | Discrete(4)                            |
+|-------------------|----------------------------------------|
+| Observation Shape | (8,)                                   |
+| Observation High  | [1.5 1.5 5. 5. 3.14 5. 1. 1. ]         |
+| Observation Low   | [-1.5 -1.5 -5. -5. -3.14 -5. -0. -0. ] |
+| Import            | gym.make("LunarLander-v2")             |
+</aside>
+
+| s[0]     | s[1]     | s[2]    | s[3]    | s[4]   | s[5]       | s[6]                          | s[7]                          |
+|----------|----------|---------|---------|--------|------------|-------------------------------|-------------------------------|
+| X | Y | Speed X | Speed Y | Ángulo | Ang. Speed | 1º pata tiene contacto sino 0 | 2º pata tiene contacto sino 0 |
+
+</div>
+
+***Acciones***:
+
+0. no hacer nada 
+1. encender motor izquierdo  
+2. encender motor principal 
+3. encender motor derecho
 
 ---
 
