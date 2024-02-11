@@ -67,6 +67,7 @@ p { font-size: 0.7rem; }
 
 <p align="center" width="100%">
     <img width="45%" src="images/DQN/Q-learn_DQlearn.png"> 
+    <img width="45%" src="images/DQN/Q-learn_DQlearn.png"> 
 </p>
 
 - En ***Q-Learning*** usamos la tablas de estados y acciones, o Q-valores.
