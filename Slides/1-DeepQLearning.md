@@ -479,10 +479,10 @@ Este algoritmo divide los ***valores-Q en dos partes distintas***, la función d
 ## Dueling Deep Q-Network
 
 ***Dueling DQN*** divide la capa final de la red en dos:
-1. Estima el valor del estado s (V(s)) 
-2. Estima la ventaja de cada acción a (A(s, a))
+1. Estima el valor del estado ***s*** --> $V(s)$ 
+2. Estima la ventaja de cada acción ***a*** --> $A(s, a)$
 
-La unión de ambas partes estima los valores-Q.
+La unión de ambas partes estima los ***valores-Q*** --> $Q = V + A - mean(A)$.
 
   
 <p align="center" width="100%">
@@ -621,12 +621,53 @@ Es parte de la libreria de Gymnasium, y uno de los entornos dentro de Box2D.
 
 ---
 
-## Recursos didácticos
+
+<!-- _class: section -->
+# Actor-Critic
+
+---
+<style scoped>
+p { font-size: 0.8rem; }
+li{font-size: 0.8rem;}
+</style>
+
+# Recopilando
+
+Desde el principio hemos obviado como clasificar los modelos de Aprendizaje por refuerzo, pero hay que situarse en contexto para seguir avanzando:
+
+1. **Modelos basados en el conocimiento del entorno**
+     - ***Aprendizaje basado en el modelo***: el agente tiene un conocimiento explicito del entorno y puede predecir como reacciona el entorno para cada acción. (Model-Based Reinforced Learning) 
+     - ***Aprendizaje basado en el modelo libre***: el agente no tiene un conocimiento explicito y debe aprender a partir de la interacción directa con él. (Q-Learning)
+2. **Modelos basados en el tipo de aprendizaje**
+      - ***Aprendizaje de valor***: el agente aprende a estimar la función de valor, la información que recibe en cada decisión guía el comportamiento del agente. (Deep Q-Learning)
+      - ***Aprendizaje de política***: el agente aprende una política óptima sin necesidad de estimar la función de valor, la política puede ser determinista o estocástica (Policy Gradiente o Advantage Actor-Critic)
+---
+
+# Actor-Critic [5]
+
+***Actor-Critic*** es una combinación de métodos basados en el valor y basados en la política, donde ***el Actor controla cómo se comporta nuestro agente*** utilizando Policy gradient, y ***el Crítico evalúa qué tan buena es la acción tomada*** por el Agente basándose en la función de valor.
+
+<p align="center" width="100%">
+    <img width="40%" src="images/Actor-Critic/Actor-Critic.png"> 
+</p>
+
+---
+
+# Actor-Critic
+
+<p align="center" width="100%">
+    <img width="80%" src="images/Actor-Critic/ActorCriticPseudo.png"> 
+</p>
+
+---
+
+# Recursos didácticos
 
 1. [Mnih, V. et al. (2015). Human-level control through deep reinforcement learning. Nature, 518(7540), 529.](https://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf)
 2. [Wang, Ziyu, et al. “Dueling network architectures for deep reinforcement learning.” arXiv preprint arXiv:1511.06581 (2015)](https://arxiv.org/pdf/1511.06581.pdf)
 3. [Van Hasselt, Hado, Arthur Guez, and David Silver. “Deep reinforcement learning with double q-learning.” Thirtieth AAAI conference on artificial intelligence. 2016](https://doi.org/10.1609/aaai.v30i1.10295)
 4. [Tensorflow tutoriales de agentes para aprendizaje por refuerzo](https://www.tensorflow.org/agents/tutorials/1_dqn_tutorial?hl=es-419)
+5. [Deep Multi-Agent Reinforcement Learning using DNN-Weight Evolution to Optimize Supply Chain Performance](https://www.researchgate.net/publication/322677430_Deep_Multi-Agent_Reinforcement_Learning_using_DNN-Weight_Evolution_to_Optimize_Supply_Chain_Performance)
 
 
 
