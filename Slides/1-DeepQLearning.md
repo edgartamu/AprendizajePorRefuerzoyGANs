@@ -6,6 +6,7 @@ description : >
 marp        : true
 paginate    : true
 theme       : bbdd
+math: mathjax
 ---
 <!--
 _header: ''
