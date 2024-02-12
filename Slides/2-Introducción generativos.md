@@ -27,17 +27,81 @@ Deep Q Network (DQN)
 
 # Introducción
 
-Previamente en "Aprendizaje por refuerzo", se ha introducido una de sus técnicas más populares: el *Q-learning*. Y además, se han establecido las bases hablando de procesos de decisión de Markov, políticas y funciones de valor.
+Tradicionalmente existen dos paradigmas de aprendizaje y distintos tipos de modelos, como son el aprendizaje ***Supervisado*** y ***No Supervisado***
 
-En este apartado extenderemos las técnicas de ***Q-Learning*** clásico incorporando el uso de *redes neuronales*, dando pie a la evolución a los modelos de ***Deep Q Network***.
+<p align="center" width="100%">
+    <img width="60%" src="images/Generativos/SupvsUns.png"> 
+</p>
 
-Algunos conocimientos de Deep Learning y recursos recomendados de interes:
+---
 
-- https://www.coursera.org/learn/neural-networks-deep-learning
-- https://www.tensorflow.org/guide/core/mlp_core
-- https://www.tensorflow.org/agents/tutorials/0_intro_rl?hl=es-419
+<style scoped>
+li { font-size: 0.8rem; }
+p { font-size: 0.8rem; }
+</style>
+
+# Introducción
+
+A su vez, existen diferentes modelos o diferentes problemas (paradigmas) que afrontar con los modelos de IA:
+
+- **Discriminativos**: predicen la probabilidad de pertenecer a una clase dado las carácterísticas de los datos de entrada.
+- **Generativos**: buscan modelar cómo se generan los datos observados y pueden generar nuevos datos similares
+
+<p align="center" width="100%">
+    <img width="50%" src="images/Generativos/DisvsGen.png"> 
+</p>
+
+---
+
+# Introducción - paradigmas de los modelos generativos
 
 
+- No solo aprenden a diferenciar, sino que aprenden la estructura de los datos
+- Son útiles en aprendizaje no supervisado
+- Es más sencillo obtener una idea de qué caracteriza una clase
+- Son más costosos computacionalemente
+
+
+---
+
+# Introducción - paradigmas de los modelos generativos
+
+Ejemplos y evolución de los modelos generativos:
+- Naive Bayes (1960~1970)
+- Máquinas de Boltzmann (RBM) (1980)
+- Modelos de Markov (HMM) (1960~1970)
+- Gaussian Mixture Models (GMMs) (1977)
+- Autoencoders variacionales (AEs) (2013)
+- Generative Adversarial Networks (GANs) (2014)
+- Transformers (2017)
+- Diffusion Models (2020)
+
+---
+
+<!-- _class: section -->
+# Autoencoders - AEs
+
+---
+
+# ¿Qué son los Autoencoders?
+
+Un tipo de red neuronal que puede aprender a comprimir y luego reconstruir datos.
+- Un autoencoder es un tipo de red neuronal utilizada en tareas de **aprendizaje no supervisado**.
+- Su objetivo es aprender una **representación compacta** de los datos de entrada.
+- Consiste en dos partes principales: el ***codificador*** y el ***decodificador***.
+- El objetivo principal de un autoencoder es ***minimizar la diferencia*** entre los datos de entrada y los datos reconstruidos por el decodificador. 
+
+---
+
+# ¿Qué son los Autoencoders?
+
+Son redes neuronales con una arquitectura compuesta de dos componentes que se entrenan al mismo tiempo:
+- **Codificador**: Transforma los datos de entrada en una representación de menor dimensión.
+- **Decodificador**: Toma esta representación y reconstruye los datos originales.
+
+<p align="center" width="100%">
+    <img width="80%" src="images/Generativos/AE.png"> 
+</p>
 
 ---
 
