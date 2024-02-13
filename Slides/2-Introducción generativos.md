@@ -104,14 +104,138 @@ Son redes neuronales con una arquitectura compuesta de dos componentes que se en
 </p>
 
 ---
+<style scoped>
+li { font-size: 0.9rem; }
+p { font-size: 0.9rem; }
+</style>
+
+# Areas de aplicación
+
+Son muy útiles en una amplia variedad de aplicaciones.
+- **Reducción de dimensionalidad**: aprender representaciones comprimidas de datos de alta dimensionalidad, lo que permite reducir el número de características necesarias para describir los datos. 
+- **Eliminación de ruido**: Al entrenar con datos ruidosos y luego reconstruirlos, se pueden obtener versiones limpias y filtradas de los mismos.
+- **Detección de anomalías**: modelar la distribución de los datos normales y detectar desviaciones significativas como anomalías. (detección de fraudes, fallas en equipos, etc.)
+- **Generación de datos**: Al muestrear del espacio latente, los autoencoders pueden generar nuevas muestras de ***datos similares*** a los ejemplos de entrenamiento.
+
+<hr>
+
+[Ian Goodfellow](https://scholar.google.es/citations?hl=es&user=iYN86KEAAAAJ) menciona que son la primera red generativa.
+
+---
+
+
+
+# Arquitectura Convolutional Autoencoder
+<p align="center" width="100%">
+    <img width="80%" src="https://www.researchgate.net/profile/Xifeng-Guo/publication/320658590/figure/fig1/AS:614154637418504@1523437284408/The-structure-of-proposed-Convolutional-AutoEncoders-CAE-for-MNIST-In-the-middle-there.png"> 
+</p>
+
+Imagen obtenida de [Deep Clustering with Convolutional Autoencoders](https://www.researchgate.net/publication/320658590_Deep_Clustering_with_Convolutional_Autoencoders)
+
+---
+<style scoped>
+li { font-size: 0.8rem; }
+p { font-size: 0.8rem; }
+</style>
+
+# Entrenamiento Semi-supervisado
+
+El entrenamiento es exactamente igual que cualquier red neuronal, la diferencia radica en qué se utiliza como **"etiquetas"**.
+- La ***función de pérdida*** se calcula comparando la salida obtenida (imagen reconstruida) con los datos que se espera obtener (imagen sin ruido, etc)
+- La razón principal por la que se considera **"semisupervisado"** es que el proceso de entrenamiento no requiere etiquetas explícitas (gato, perro, etc).
+
+<p align="center" width="100%">
+    <img width="40%" src="images/Generativos/AEestructura.png"> 
+</p>
+
+<hr>
+«Que no os vendan la moto, es un entrenamiento supervisado », Edgar Talavera.
+
+---
+
+<!-- _class: section -->
+# Variational Autoencoders
+
+---
+
+# Motivación
+
+Los **Autoencoders** tienen un gran problema: no son buenos generadores de datos.
+
+<center><b>¿Por qué?</b></center>
+
+Pensemos en un ejemplo sencillo: la reconstrucción de imágenes del dataset MNIST.
+
+<center><b>¿Cómo pensáis que será el espacio latente?</b></center>
+
+---
+
+# Motivación
+
+<p align="center" width="100%">
+    <img width="70%" src="images/Generativos/LantentRepresentation.png"> 
+</p>
+
+---
+
+# Motivación
+
+Al **no ser una distribución de datos continua**, tendremos problemas cuando la entrada sea ligeramente distinta a los datos con los que se entrenó el autoencoder:
+
+
+<p align="center" width="100%">
+    <img width="30%" src="images/Generativos/AEproblem.png"> 
+</p>
+
+¿Qué ocurrirá cuando la entrada sean imágenes que generen espacios latentes entre medio de las muestras de entrenamiento?
+
+---
+
+# Motivación
+
+- **Espacios continuos**: En un espacio continuo, los datos pueden tomar un rango infinito de valores dentro de un intervalo determinado.
+- **Espacios discretos**: En un espacio discreto, los datos solo pueden tomar un conjunto finito o contablemente infinito de valores distintos.
+<p align="center" width="100%">
+    <img width="70%" src="images/Generativos/ContinuoDiscreto.png"> 
+</p>
+
+---
+
+# Motivación
+La mejor situación que buscamos es conseguir:
+- Un espacio latente **continuo** y **ordenado**
+- En el espacio ordenado permite tener las muestras similares agrupadas
+- No se pierde la capacidad de interpolar entre diferentes muestras
+<p align="center" width="100%">
+    <img width="40%" src="images/Generativos/AEproblem2.png"> 
+</p>
+
+---
+<style scoped>
+li { font-size: 0.8rem; }
+p { font-size: 0.8rem; }
+</style>
+
+# Motivación - ¿Cómo lo conseguimos?
+- Solo podemos forzar a la propia red a que ordene el espacio latente
+- ¿Cómo?
+- Durante el entrenamiento, se minimiza una función de perdida 
+- ¿Y...?
+- Pués ahí es donde vamos a trabajar, pero entonces ya no usamos un Autoencoder...
+
+<p align="center" width="100%">
+    <img width="70%" src="images/Generativos/ContinuoyOrdenado.png"> 
+</p>
+
+---
 
 # Recursos didácticos
 
-1. [Mnih, V. et al. (2015). Human-level control through deep reinforcement learning. Nature, 518(7540), 529.](https://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf)
-2. [Wang, Ziyu, et al. “Dueling network architectures for deep reinforcement learning.” arXiv preprint arXiv:1511.06581 (2015)](https://arxiv.org/pdf/1511.06581.pdf)
-3. [Van Hasselt, Hado, Arthur Guez, and David Silver. “Deep reinforcement learning with double q-learning.” Thirtieth AAAI conference on artificial intelligence. 2016](https://doi.org/10.1609/aaai.v30i1.10295)
-4. [Tensorflow tutoriales de agentes para aprendizaje por refuerzo](https://www.tensorflow.org/agents/tutorials/1_dqn_tutorial?hl=es-419)
-5. [Deep Multi-Agent Reinforcement Learning using DNN-Weight Evolution to Optimize Supply Chain Performance](https://www.researchgate.net/publication/322677430_Deep_Multi-Agent_Reinforcement_Learning_using_DNN-Weight_Evolution_to_Optimize_Supply_Chain_Performance)
+1. [Reducing the dimensionality of data with neural networks.
+science, 313(5786):504–507, 2006](https://www.science.org/doi/10.1126/science.1127647)
+2. [Extracting and composing robust features with denoising autoencoders, 2008.](https://www.cs.toronto.edu/~larocheh/publications/icml-2008-denoising-autoencoders.pdf)
+3. [Semi-Supervised Recurrent Variational Autoencoder Approach for Visual Diagnosis of Atrial Fibrillation](https://www.researchgate.net/publication/349939162_Semi-Supervised_Recurrent_Variational_Autoencoder_Approach_for_Visual_Diagnosis_of_Atrial_Fibrillation)
+4. [Variational Autoencoders, Radboud University](https://indico.ictp.it/event/8674/session/155/contribution/1121/material/slides/0.pdf)
 
 
 
