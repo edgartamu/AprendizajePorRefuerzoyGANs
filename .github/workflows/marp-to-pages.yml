@@ -30,17 +30,9 @@ jobs:
       - name: Slides in PDF
         uses: docker://marpteam/marp-cli:v1.7.0
         with:
-          args: -I Slides/ -o build/Slides/ --html --pdf --allow-local-files --theme-set styles/styles.css
+          args: -I Slides/ -o build/Slides/ --pdf --allow-local-files --theme-set Slides/styles/bbdd.css
         env:
           MARP_USER: root:root
-
-      - name: Compile LaTeX document
-        uses: xu-cheng/latex-action@v3
-        with:
-          root_file: "*.tex"
-          working_directory: ejercicios
-          continue_on_error: true
-          latexmk_shell_escape: true
 
       - name: Deploy preview
         if: ${{ github.event_name == 'pull_request' }}
