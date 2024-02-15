@@ -1,57 +1,33 @@
-name: build-pdfs
-concurrency: build-pdfs
+name: marp-to-pages
+
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-      - closed
+    branches:
+      - main
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout code
+      - name: Checkout 🛎️
         uses: actions/checkout@v3
 
-      - name: Images for slides
-        run: mkdir -p build/Slides && cp -R Slides/images/Actor-Critic build/Slides/images/Actor-Critic
+      - name: Copy images ʕ•́ᴥ•̀ʔっ
+        run: mkdir -p build/Slides && cp -R Slides/images build/Slides
 
-      - name: Images for slides DQN
-        run: mkdir -p build/Slides && cp -R Slides/images/DQN build/Slides/images/DQN
-        
-      - name: Images for slides Gen
-        run: mkdir -p build/Slides && cp -R Slides/images/Generativos build/Slides/images/Generativos
-
-      - name: Slides in HTML
+      - name: Marp Build PDFs ( ͡👁️ ͜ʖ ͡👁️)
         uses: docker://marpteam/marp-cli:v1.7.0
         with:
-          args: -I Slides/ -o build/Slides/ --html --allow-local-files
+          args: -I Slides/ -o build/Slides/ --pdf --html --allow-local-files --theme-set Slides/styles/
         env:
           MARP_USER: root:root
 
-      - name: Slides in PDF
-        uses: docker://marpteam/marp-cli:v1.7.0
-        with:
-          args: -I Slides/ -o build/Slides/ --pdf --allow-local-files --theme-set Slides/styles/bbdd.css
-        env:
-          MARP_USER: root:root
-
-      - name: Deploy preview
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: rossjrw/pr-preview-action@v1
-        with:
-          source-dir: ./build/
-          preview-branch: gh-pages
-          umbrella-dir: pr-preview
-
-      - name: Deploy production
-        if: ${{ github.event_name == 'push' }}
+      - name: Deploy!! 💩
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages
           folder: ./build/
           clean-exclude: pr-preview/
