@@ -1,33 +1,59 @@
-name: marp-to-pages
-
+name: build-pdfs
+concurrency: build-pdfs
 on:
   push:
-    branches:
-      - main
-
-permissions:
-  contents: write
-
+    branches: [ main ]
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout 🛎️
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Copy images ʕ•́ᴥ•̀ʔっ
-        run: mkdir -p build/Slides && cp -R Slides/images build/Slides
+      - name: Images for slides
+        run: mkdir -p build/Slides && cp -R Slides/images build/Slides/images
 
-      - name: Marp Build PDFs ( ͡👁️ ͜ʖ ͡👁️)
+      - name: Slides in HTML
         uses: docker://marpteam/marp-cli:v1.7.0
         with:
-          args: -I Slides/ -o build/Slides/ --pdf --html --allow-local-files --theme-set Slides/styles/
+          args: -I Slides/ -o build/Slides/ --html --allow-local-files
         env:
           MARP_USER: root:root
 
-      - name: Deploy!! 💩
+      - name: Slides in PDF
+        uses: docker://marpteam/marp-cli:v1.7.0
+        with:
+          args: -I Slides/ -o build/Slides/ --html --pdf --allow-local-files --theme-set styles/styles.css
+        env:
+          MARP_USER: root:root
+
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: "*.tex"
+          working_directory: ejercicios
+          continue_on_error: true
+          latexmk_shell_escape: true
+
+      - name: Deploy preview
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./build/
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+
+      - name: Deploy production
+        if: ${{ github.event_name == 'push' }}
         uses: JamesIves/github-pages-deploy-action@v4
         with:
+          branch: gh-pages
           folder: ./build/
           clean-exclude: pr-preview/
